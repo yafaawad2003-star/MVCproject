@@ -1,0 +1,84 @@
+<div class="row g-3">
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h4 class="mb-3">חיפוש סרטונים</h4>
+
+        <% if (apiError) { %>
+  <div class="alert alert-warning mt-2"><%= apiError %></div>
+<% } %>
+
+        <form class="d-flex gap-2" method="get" action="/youtube">
+          <input class="form-control" name="q" value="<%= q %>" placeholder="חפשי משהו..." />
+          <button class="btn btn-primary">Search</button>
+        </form>
+
+        <% if (results.length) { %>
+          <hr />
+          <div class="row g-3">
+            <% results.forEach(v => { %>
+              <div class="col-md-6">
+                <div class="border rounded p-2 d-flex gap-3 align-items-start">
+                  <img src="<%= v.thumbnail_url %>" style="width:140px" class="rounded" />
+                  <div class="flex-grow-1">
+                    <div class="fw-bold"><%= v.title %></div>
+                    <div class="text-muted small"><%= v.channel_title %></div>
+                    <a class="small" target="_blank" href="https://www.youtube.com/watch?v=<%= v.video_id %>">Open</a>
+
+                    <form class="mt-2" method="post" action="/youtube/favorite">
+                      <input type="hidden" name="q" value="<%= q %>">
+                      <input type="hidden" name="video_id" value="<%= v.video_id %>">
+                      <input type="hidden" name="title" value="<%= v.title.replaceAll('\"','&quot;') %>">
+                      <input type="hidden" name="thumbnail_url" value="<%= v.thumbnail_url %>">
+                      <input type="hidden" name="channel_title" value="<%= v.channel_title.replaceAll('\"','&quot;') %>">
+                      <button class="btn btn-sm btn-outline-success">Save to favorites</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h4 class="mb-3">המועדפים שלי</h4>
+
+        <% if (!favorites.length) { %>
+          <div class="text-muted">עדיין אין מועדפים.</div>
+        <% } else { %>
+          <div class="list-group">
+            <% favorites.forEach(f => { %>
+              <div class="list-group-item d-flex align-items-center justify-content-between">
+                <div class="d-flex gap-3 align-items-center">
+                  <img src="<%= f.thumbnail_url %>" style="width:90px" class="rounded" />
+                  <div>
+                    <div class="fw-bold"><%= f.title %></div>
+                    <div class="text-muted small"><%= f.channel_title %></div>
+                  </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                  <a class="btn btn-sm btn-outline-primary" target="_blank"
+                     href="https://www.youtube.com/watch?v=<%= f.video_id %>">Open</a>
+
+                  <form method="post" action="/youtube/favorite/delete">
+                    <input type="hidden" name="q" value="<%= q %>">
+                    <input type="hidden" name="video_id" value="<%= f.video_id %>">
+                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                  </form>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+
+      </div>
+    </div>
+  </div>
+</div>
